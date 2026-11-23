@@ -1,0 +1,34 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam shadowing false
+title Как один факт становится сообщением RabbitMQ?
+
+participant "Order" as O
+participant "OrderingApplicationService" as A
+participant "UnitOfWork" as U
+database "state, events, outbox" as D
+participant "OutboxRelay" as R
+participant "RabbitMqPublisher" as P
+queue "north.events" as Q
+
+O -> A : place()
+O -> O : записать OrderPlaced
+A -> U : save_aggregate()
+U -> D : одна транзакция
+note right of D
+  состояние агрегата
+  доменный факт
+  PENDING outbox
+end note
+R -> D : claim_pending(), lease
+R -> P : publish(message)
+P -> Q : persistent publish
+Q --> P : publisher confirm
+R -> D : mark_published()
+
+legend bottom
+Вопрос: когда relay видит сообщение?
+Ответ: только после commit состояния, факта и outbox-строки.
+endlegend
+@enduml

@@ -1,0 +1,19 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam shadowing false
+title Чистые доменные службы
+class CatalogPricingService <<DomainService>>
+class WarehouseAllocationService <<DomainService>>
+class ShipmentPlanningService <<DomainService>>
+class PriceQuote <<ValueObject>>
+class AllocationPlan <<ValueObject>>
+class DispatchPlan <<ValueObject>>
+CatalogPricingService --> PriceQuote
+WarehouseAllocationService --> AllocationPlan
+ShipmentPlanningService --> DispatchPlan
+note bottom
+DispatchPlan читает несколько Shipment;
+каждый dispatch выполняется отдельной Unit of Work.
+end note
+@enduml

@@ -1,0 +1,27 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam shadowing false
+title Граница интеграционного контракта
+class Notification {
+  position
+  eventId
+  contextName
+  payload: scalars
+}
+class NotificationMessage {
+  messageId
+  schemaVersion
+  routingKey
+  body(): JSON
+}
+class RabbitMqPublisher <<Adapter>>
+class RabbitMqConsumer <<Adapter>>
+Notification --> NotificationMessage
+RabbitMqPublisher --> NotificationMessage
+RabbitMqConsumer --> NotificationMessage
+note bottom
+Контракт не переносит агрегат
+и не вводит общий доменный класс.
+end note
+@enduml

@@ -1,0 +1,34 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam shadowing false
+title Порт репозитория, Unit of Work и Data Mapper
+class OrderingApplicationService
+interface UnitOfWorkFactory <<Port>>
+interface ApplicationUnitOfWork <<Port>>
+interface RepositoryRegistry <<Port>>
+interface AggregateRepositoryPort <<Port>>
+class Database <<Adapter>>
+class UnitOfWork <<Adapter>>
+class SqlAlchemyRepositoryRegistry <<Adapter>>
+class OrderRepository <<Adapter>>
+class JsonAggregateDataMapper
+entity OrderRow
+class Order
+OrderingApplicationService --> UnitOfWorkFactory
+Database ..|> UnitOfWorkFactory
+Database --> UnitOfWork
+UnitOfWork ..|> ApplicationUnitOfWork
+UnitOfWork --> RepositoryRegistry
+SqlAlchemyRepositoryRegistry ..|> RepositoryRegistry
+RepositoryRegistry --> AggregateRepositoryPort
+SqlAlchemyRepositoryRegistry --> OrderRepository
+OrderRepository ..|> AggregateRepositoryPort
+OrderRepository --> JsonAggregateDataMapper
+JsonAggregateDataMapper --> OrderRow
+JsonAggregateDataMapper --> Order
+note right of JsonAggregateDataMapper
+ORM-строка не является
+доменным объектом.
+end note
+@enduml

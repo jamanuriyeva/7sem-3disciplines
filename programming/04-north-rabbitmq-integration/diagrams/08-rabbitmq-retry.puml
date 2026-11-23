@@ -1,0 +1,42 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam shadowing false
+title Как повтор возвращается только своему подписчику?
+
+queue "Главная очередь\nподписчика" as Q
+participant "RabbitMqConsumer" as C
+database "inbox, процесс\nи work-item" as D
+queue "north.delivery.retry" as R
+queue "retry-очередь\nэтого подписчика" as T
+queue "north.delivery.return" as B
+queue "north.delivery.dead" as X
+queue "DLQ этого\nподписчика" as L
+
+Q -> C : delivery(message_id)
+C -> D : локальная транзакция
+alt commit успешен или inbox уже содержит ключ
+  D --> C : commit
+  C -> Q : manual ack
+else локальная команда завершилась ошибкой
+  D --> C : rollback
+  alt попытки ещё доступны
+    C -> R : publish retry.<queue>
+    R --> C : publisher confirm
+    R -> T : только точный ключ
+    C -> Q : manual ack исходной доставки
+    T -> B : TTL истёк
+    B -> Q : retry.<queue>
+  else лимит попыток исчерпан
+    C -> X : publish dead.<queue>
+    X --> C : publisher confirm
+    X -> L : только точный ключ
+    C -> Q : manual ack исходной доставки
+  end
+end
+
+legend bottom
+Вопрос: почему повтор не получает другой подписчик?
+Ответ: retry и DLQ используют точные ключи, выведенные из имени его очереди.
+endlegend
+@enduml

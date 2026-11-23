@@ -1,0 +1,27 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam shadowing false
+title Журнал фактов и диагностическое polling-уведомление
+participant "ApplicationService" as S
+participant "Агрегат" as A
+participant "UnitOfWork" as U
+database "актуальное состояние" as STATE
+database "domain_events" as E
+participant "NotificationLog" as N
+participant "NotificationDispatcher" as D
+participant "ApplicationService" as H
+S -> A : предметная команда
+A -> A : зарегистрировать внутренний факт
+S -> U : save_aggregate()
+U -> STATE : сохранить состояние
+U -> E : append внутреннего факта
+N -> E : next_notifications()
+D -> N : polling
+D -> H : Notification со скалярами
+H -> U : локальная реакция и receipt
+note bottom
+Агрегат не вызывает чужой агрегат.
+Уведомление производно от сохранённого факта.
+end note
+@enduml
