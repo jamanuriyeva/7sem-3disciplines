@@ -1,0 +1,21 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam shadowing false
+title Пять контекстов магазина «Север»
+rectangle Catalog #DDEEFF
+rectangle Ordering #DFF5E1
+rectangle Inventory #FFF0CC
+rectangle Payment #F9DDE1
+rectangle Shipping #E9E0F7
+Catalog --> Ordering : PublishedOfferContract (скаляры)
+Ordering ..> Inventory : OrderId, SKU, количество
+Ordering ..> Payment : OrderId, сумма
+Ordering ..> Shipping : снимок заказа
+note bottom
+Передаются значения и контракты,
+а не экземпляры чужих агрегатов.
+Ordering переводит контракт
+в локальный CatalogOfferSnapshot.
+end note
+@enduml

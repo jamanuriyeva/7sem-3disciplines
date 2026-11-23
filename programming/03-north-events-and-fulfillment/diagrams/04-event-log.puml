@@ -1,0 +1,21 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam shadowing false
+title Один локальный Unit of Work
+participant "OrderingApplicationService" as A
+participant Order
+participant "UnitOfWork" as U
+database "ordering_orders" as S
+database "domain_events" as E
+A -> Order : place()
+Order -> Order : OrderPlaced
+A -> U : save_aggregate(Order)
+U -> S : актуальное состояние
+U -> E : append OrderPlaced
+U -> U : commit
+note bottom
+Вопрос: может ли факт сохраниться без размещённого заказа?
+Ответ: нет, обе записи фиксируются одной локальной транзакцией.
+end note
+@enduml

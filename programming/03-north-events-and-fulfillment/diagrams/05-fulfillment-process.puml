@@ -1,0 +1,23 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam shadowing false
+title Состояния FulfillmentProcess
+scale 0.55
+[*] --> WAITING_PAYMENT : OrderPlaced
+WAITING_PAYMENT --> WAITING_STOCK : PaymentAuthorized
+WAITING_PAYMENT --> WAITING_ORDER_RESULT : PaymentAuthorizationRejected
+WAITING_STOCK --> WAITING_STOCK : InventoryReserved
+WAITING_STOCK --> WAITING_SHIPMENT : все строки зарезервированы
+WAITING_SHIPMENT --> WAITING_CAPTURE : ShipmentCreated
+WAITING_CAPTURE --> WAITING_ORDER_RESULT : PaymentCaptured
+WAITING_CAPTURE --> COMPENSATING_SHIPMENT : PaymentCaptureRejected
+COMPENSATING_SHIPMENT --> COMPENSATING_STOCK : ShipmentCancelled
+WAITING_ORDER_RESULT --> COMPLETED : OrderFulfilled
+WAITING_STOCK --> COMPENSATING_STOCK : InventoryReservationRejected
+COMPENSATING_STOCK --> COMPENSATING_PAYMENT : все резервы освобождены
+COMPENSATING_PAYMENT --> WAITING_ORDER_RESULT : PaymentVoided
+WAITING_ORDER_RESULT --> REJECTED : OrderFulfillmentRejected
+COMPLETED --> [*]
+REJECTED --> [*]
+@enduml

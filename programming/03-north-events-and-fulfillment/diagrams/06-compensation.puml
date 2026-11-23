@@ -1,0 +1,25 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam shadowing false
+title Отказ строки и предметная компенсация
+participant "FulfillmentProcess" as F
+participant "InventoryApplicationService" as IA
+participant StockItem
+participant "PaymentApplicationService" as PA
+participant Payment
+participant "OrderingApplicationService" as OA
+participant Order
+F -> IA : reserve_for_line()
+IA -> StockItem : reserve()
+StockItem --> F : InventoryReservationRejected
+F -> IA : release_reservation() для подтверждённых
+IA -> StockItem : release()
+StockItem --> F : InventoryReservationReleased
+F -> PA : void()
+PA -> Payment : void()
+Payment --> F : PaymentVoided
+F -> OA : reject_fulfillment()
+OA -> Order : reject_fulfillment()
+Order --> F : OrderFulfillmentRejected
+@enduml

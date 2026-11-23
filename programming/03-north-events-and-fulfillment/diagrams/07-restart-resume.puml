@@ -1,0 +1,29 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam shadowing false
+title Как FulfillmentProcess продолжает работу после остановки?
+
+participant "NotificationDispatcher" as D
+participant "FulfillmentApplicationService" as A
+database "process + receipt" as P
+participant "PaymentApplicationService" as PA
+database "payment + domain_events" as E
+
+D -> A : OrderPlaced
+A -> P : этап, work-item, receipt
+note right of P
+  commit
+  остановка возможна здесь
+end note
+... новый запуск ...
+A -> P : захватить сохранённый work-item
+A -> PA : authorize()
+PA -> E : commit платежа и PaymentAuthorized
+A -> P : отметить work-item выполненным
+
+legend bottom
+Вопрос: теряется ли команда после commit receipt?
+Ответ: нет, resume захватывает сохранённый work-item отдельно от журнала.
+endlegend
+@enduml
