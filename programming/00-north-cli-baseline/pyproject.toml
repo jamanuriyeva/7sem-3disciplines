@@ -1,0 +1,14 @@
+[project]
+name = "north-cli-baseline"
+version = "0.1.0"
+description = "Процедурная исходная точка магазина Север"
+requires-python = ">=3.12,<3.13"
+dependencies = []
+
+[dependency-groups]
+dev = ["pytest>=8.3,<9"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-q"

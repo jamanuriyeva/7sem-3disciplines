@@ -1,0 +1,17 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam shadowing false
+title Процедурное оформление заказа
+actor Оператор
+participant "checkout()" as C
+database "общий словарь" as S
+Оператор -> C : адрес
+C -> S : читает корзину, каталог и остаток
+C -> S : меняет остаток и список заказов
+C --> Оператор : словарь заказа
+note right of C
+Одна процедура владеет
+несколькими несвязанными правилами.
+end note
+@enduml

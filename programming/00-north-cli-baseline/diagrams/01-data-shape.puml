@@ -1,0 +1,15 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam shadowing false
+title Изменяемое состояние без предметных границ
+rectangle "state: dict" {
+  collections catalog
+  collections stock
+  collections cart
+  collections orders
+}
+catalog ..> stock : SKU
+cart ..> catalog : SKU
+orders ..> stock : прямое изменение
+@enduml

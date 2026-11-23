@@ -1,0 +1,26 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam shadowing false
+title Агрегат заказа
+class Order <<AggregateRoot>> {
+  +create_draft()
+  +add_paid_line()
+  +set_shipping_address()
+  +place()
+}
+class OrderLine <<Entity>> {
+  lineId
+}
+class Money <<ValueObject>> {
+}
+class Quantity <<ValueObject>> {
+}
+Order "1" *-- "0..*" OrderLine
+OrderLine *-- Money
+OrderLine *-- Quantity
+note right of Order
+Только корень изменяет
+состав и состояние заказа.
+end note
+@enduml

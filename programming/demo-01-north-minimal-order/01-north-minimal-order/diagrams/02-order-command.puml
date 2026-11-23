@@ -1,0 +1,16 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam shadowing false
+title Путь команды размещения
+actor Клиент
+participant "REST-контроллер" as R
+participant "OrderingApplicationService" as A
+participant Order as O
+Клиент -> R : POST /orders/{id}/place
+R -> A : place(id)
+A -> O : place()
+O --> A : снимок
+A --> R : снимок
+R --> Клиент : 200 JSON
+@enduml
